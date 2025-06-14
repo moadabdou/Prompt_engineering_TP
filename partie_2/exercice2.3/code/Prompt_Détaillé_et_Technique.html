@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculatrice 🔢</title>
+    <style>
+        /* Style général du corps de la page */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #222;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Conteneur principal de la calculatrice */
+        .calculator {
+            background-color: #333;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
+            width: 320px;
+        }
+
+        /* Écran d'affichage des calculs */
+        .display {
+            width: 100%;
+            height: 70px;
+            background-color: #1e1e1e;
+            color: white;
+            font-size: 2.8em;
+            text-align: right;
+            padding: 15px;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Grille pour les boutons */
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        /* Style de base pour tous les boutons */
+        .btn {
+            padding: 20px;
+            font-size: 1.6em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            background-color: #505050;
+            color: white;
+            transition: background-color 0.2s ease-in-out, transform 0.1s;
+        }
+
+        .btn:hover {
+            background-color: #6a6a6a;
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Style spécifique pour les boutons d'opérateurs */
+        .operator {
+            background-color: #f39c12; /* Orange */
+        }
+
+        .operator:hover {
+            background-color: #e67e22;
+        }
+
+        /* Style pour le bouton d'égalité */
+        .equal-btn {
+            background-color: #2ecc71; /* Vert */
+        }
+
+        .equal-btn:hover {
+            background-color: #27ae60;
+        }
+
+        /* Style pour le bouton d'effacement (Clear) */
+        .clear-btn {
+            background-color: #e74c3c; /* Rouge */
+        }
+        
+        .clear-btn:hover {
+            background-color: #c0392b;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="calculator">
+    <input type="text" class="display" id="display" readonly>
+    <div class="buttons-grid">
+        <button class="btn clear-btn" onclick="clearDisplay()">C</button>
+        <button class="btn operator" onclick="appendOperator('/')">÷</button>
+        <button class="btn operator" onclick="appendOperator('*')">×</button>
+        <button class="btn operator" onclick="appendOperator('-')">−</button>
+        
+        <button class="btn" onclick="appendNumber('7')">7</button>
+        <button class="btn" onclick="appendNumber('8')">8</button>
+        <button class="btn" onclick="appendNumber('9')">9</button>
+        <button class="btn operator" onclick="appendOperator('+')">+</button>
+
+        <button class="btn" onclick="appendNumber('4')">4</button>
+        <button class="btn" onclick="appendNumber('5')">5</button>
+        <button class="btn" onclick="appendNumber('6')">6</button>
+        
+        <button class="btn" onclick="appendNumber('1')">1</button>
+        <button class="btn" onclick="appendNumber('2')">2</button>
+        <button class="btn" onclick="appendNumber('3')">3</button>
+        
+        <button class="btn" onclick="appendNumber('0')">0</button>
+        <button class="btn" onclick="appendNumber('.')">.</button>
+        <button class="btn equal-btn" onclick="calculateResult()">=</button>
+    </div>
+</div>
+
+<script>
+    const display = document.getElementById('display');
+
+    // Ajoute un chiffre ou un point à l'affichage
+    function appendNumber(number) {
+        // Empêche l'ajout de plusieurs points dans le même nombre
+        const currentExpression = display.value;
+        const parts = currentExpression.split(/[\+\-\*\/]/);
+        const lastPart = parts[parts.length - 1];
+        if (number === '.' && lastPart.includes('.')) {
+            return;
+        }
+        display.value += number;
+    }
+
+    // Ajoute un opérateur à l'affichage
+    function appendOperator(operator) {
+        const lastChar = display.value.slice(-1);
+        // Empêche les opérateurs consécutifs (ex: 5 * *)
+        if (['+', '-', '*', '/'].includes(lastChar)) {
+            display.value = display.value.slice(0, -1) + operator;
+        } else if (display.value !== '') {
+            display.value += operator;
+        }
+    }
+
+    // Efface l'affichage
+    function clearDisplay() {
+        display.value = '';
+    }
+
+    // Calcule le résultat de l'expression
+    function calculateResult() {
+        try {
+            const expression = display.value;
+            // Gère les saisies invalides
+            if (/[+\-\*\/]$/.test(expression) || expression === "") {
+                display.value = "Erreur";
+                return;
+            }
+
+            // Fonction de calcul sécurisée
+            const result = evaluateExpression(expression);
+
+            // Gère la division par zéro
+            if (!isFinite(result)) {
+                display.value = "Erreur";
+            } else {
+                display.value = result;
+            }
+        } catch (error) {
+            display.value = "Erreur";
+        }
+    }
+
+    /**
+     * Évalue une expression mathématique de manière sécurisée sans utiliser eval().
+     * Gère les opérations de base (+, -, *, /).
+     * @param {string} expr - L'expression à évaluer.
+     * @returns {number} Le résultat du calcul.
+     */
+    function evaluateExpression(expr) {
+        // Remplace les symboles × et ÷ pour le calcul
+        expr = expr.replace(/×/g, '*').replace(/÷/g, '/');
+
+        // Utilise le constructeur de Fonction pour une évaluation plus sûre que eval()
+        // C'est une alternative courante et plus sécurisée.
+        return new Function('return ' + expr)();
+    }
+</script>
+
+</body>
+</html>

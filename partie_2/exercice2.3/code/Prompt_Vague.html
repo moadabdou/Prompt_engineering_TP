@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculatrice Simple</title>
+    <style>
+        /* --- Style CSS --- */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+        .calculator {
+            border: 2px solid #333;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        .display {
+            background-color: #222;
+            color: #fff;
+            font-size: 2.5em;
+            padding: 20px;
+            text-align: right;
+            height: 70px;
+            box-sizing: border-box;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+        }
+        button {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            font-size: 1.5em;
+            padding: 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #e0e0e0;
+        }
+        .operator {
+            background-color: #f39c12;
+            color: #fff;
+        }
+        .operator:hover {
+            background-color: #e67e22;
+        }
+        .clear {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+        .clear:hover {
+            background-color: #c0392b;
+        }
+        .equal {
+            background-color: #2ecc71;
+            color: #fff;
+            grid-column: span 2;
+        }
+        .equal:hover {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator">
+        <div id="display" class="display">0</div>
+        <div class="buttons">
+            <button onclick="clearDisplay()" class="clear">C</button>
+            <button onclick="appendValue('/')" class="operator">/</button>
+            <button onclick="appendValue('*')" class="operator">*</button>
+            <button onclick="appendValue('7')">7</button>
+            <button onclick="appendValue('8')">8</button>
+            <button onclick="appendValue('9')">9</button>
+            <button onclick="appendValue('-')" class="operator">-</button>
+            <button onclick="appendValue('4')">4</button>
+            <button onclick="appendValue('5')">5</button>
+            <button onclick="appendValue('6')">6</button>
+            <button onclick="appendValue('+')" class="operator">+</button>
+            <button onclick="appendValue('1')">1</button>
+            <button onclick="appendValue('2')">2</button>
+            <button onclick="appendValue('3')">3</button>
+            <button onclick="calculateResult()" class="equal">=</button>
+            <button onclick="appendValue('0')" style="grid-column: span 2;">0</button>
+            <button onclick="appendValue('.')">.</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+
+        // Ajoute la valeur cliquée à l'écran
+        function appendValue(value) {
+            if (display.innerText === '0' || display.innerText === 'Erreur') {
+                display.innerText = value;
+            } else {
+                display.innerText += value;
+            }
+        }
+
+        // Efface l'écran
+        function clearDisplay() {
+            display.innerText = '0';
+        }
+
+        // Calcule le résultat de l'expression
+        function calculateResult() {
+            try {
+                // Utilise eval() pour calculer la chaîne de caractères. Attention : eval() peut être dangereux s'il est utilisé sur du code non contrôlé.
+                // Pour une simple calculatrice, c'est acceptable.
+                let result = eval(display.innerText.replace(/,/g, '.'));
+                display.innerText = result;
+            } catch (error) {
+                display.innerText = 'Erreur';
+            }
+        }
+    </script>
+
+</body>
+</html>
